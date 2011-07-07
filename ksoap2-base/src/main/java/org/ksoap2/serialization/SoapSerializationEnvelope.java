@@ -21,6 +21,7 @@ package org.ksoap2.serialization;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.SoapFault;
+import org.ksoap2.SoapFault12;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlSerializer;
@@ -118,9 +119,15 @@ public class SoapSerializationEnvelope extends SoapEnvelope
 		if (parser.getEventType() == XmlPullParser.START_TAG && parser.getNamespace().equals(env)
 				&& parser.getName().equals("Fault"))
 		{
-			SoapFault fault = new SoapFault();
-			fault.parse(parser);
-			bodyIn = fault;
+			if (this.version < SoapEnvelope.VER12) {
+        		SoapFault fault = new SoapFault();
+        		fault.parse(parser);
+        		bodyIn = fault;
+        	} else {
+        		SoapFault12 fault = new SoapFault12(this.env);
+        		fault.parse(parser);
+        		bodyIn = fault;
+        	}
 		}
 		else
 		{
@@ -539,13 +546,17 @@ public class SoapSerializationEnvelope extends SoapEnvelope
 	 *
 	 * @since 2.0.3
 	 * @return response from the soap call.
-	 * @throws SoapFault
+	 * @throws SoapFault, SoapFault12
 	 */
-	public Object getResponse() throws SoapFault
+	public Object getResponse() throws SoapFault, SoapFault12
 	{
 		if (bodyIn instanceof SoapFault)
 		{
 			throw (SoapFault) bodyIn;
+		}
+		if (bodyIn instanceof SoapFault12)
+		{
+			throw (SoapFault12) bodyIn;
 		}
 		KvmSerializable ks = (KvmSerializable) bodyIn;
 

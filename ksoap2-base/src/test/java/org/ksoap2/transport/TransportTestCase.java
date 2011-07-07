@@ -37,7 +37,7 @@ public abstract class TransportTestCase extends TestCase {
         assertEquals("kSOAP/2.0", aServiceConnection.requestPropertyMap.get("User-Agent"));
     }
 
-    protected void assertSerializationDeserialization() throws SoapFault {
+    protected void assertSerializationDeserialization() throws SoapFault, SoapFault12 {
         String outputString = new String(serviceConnection.outputStream.toByteArray());
         assertTrue(outputString.indexOf(complexParameter.name) > 0);
         assertTrue(outputString.indexOf(""+complexParameter.count) > 0);
